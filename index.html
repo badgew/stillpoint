@@ -34,12 +34,6 @@
 		/>
 		<link rel="manifest" href="assets/favicon/site.webmanifest" />
 
-		<!-- Preload both webfonts so the browser fetches them in parallel
-		     with stylesheet parsing instead of waiting to discover their
-		     URLs inside @font-face. The `crossorigin` attribute is
-		     required even for same-origin fonts — without it the preload
-		     won't match the eventual font request (fonts are fetched in
-		     anonymous CORS mode). -->
 		<link
 			rel="preload"
 			href="assets/fonts/RiformaLL-Regular.woff2"
@@ -59,9 +53,6 @@
 	</head>
 
 	<body>
-		<!-- Mobile nav toggle. Hidden at desktop via CSS.
-		     Renders as '+' when closed, '−' when open: two bars, vertical
-		     bar hidden under [aria-expanded="true"]. -->
 		<button
 			class="nav-toggle"
 			type="button"
@@ -69,8 +60,14 @@
 			aria-controls="primary-nav"
 			aria-label="Open menu"
 		>
-			<span class="nav-toggle__bar nav-toggle__bar--h" aria-hidden="true"></span>
-			<span class="nav-toggle__bar nav-toggle__bar--v" aria-hidden="true"></span>
+			<span
+				class="nav-toggle__bar nav-toggle__bar--h"
+				aria-hidden="true"
+			></span>
+			<span
+				class="nav-toggle__bar nav-toggle__bar--v"
+				aria-hidden="true"
+			></span>
 		</button>
 
 		<section class="frame">
@@ -121,7 +118,9 @@
 						thoughtfully crafted.
 					</p>
 					<div class="cta-wrap">
-						<button type="button" class="btn js-copy-email">GET IN TOUCH</button>
+						<button type="button" class="btn js-copy-email">
+							GET IN TOUCH
+						</button>
 						<span class="copy-confirm" aria-live="polite"></span>
 					</div>
 				</section>
@@ -156,7 +155,7 @@
 							</h3>
 							<!-- <a href="#" class="btn">LEARN MORE</a> -->
 						</article>
-						
+
 						<article class="project-card">
 							<img
 								src="assets/images/newton.jpeg"
@@ -182,25 +181,25 @@
 							</h3>
 							<!-- <a href="#" class="btn">LEARN MORE</a> -->
 						</article>
-
 					</div>
 				</section>
 
 				<section class="case-studies" id="services">
 					<h2 class="section-label">SERVICES</h2>
 
-				<div class="project-grid">
+					<div class="project-grid">
 						<article class="project-card">
 							<p class="project-card__label">GENERAL CONTRACTING</p>
 							<h3 class="project-card__title">
-								Kitchen<br>Bathrooms<br>Additions<br>Renovations
+								Kitchen<br />Bathrooms<br />Additions<br />Renovations
 							</h3>
 						</article>
 
 						<article class="project-card">
 							<p class="project-card__label">FINISH CARPENTRY</p>
 							<h3 class="project-card__title">
-								Doors<br>Windows<br>Custom cabinetry<br>Built-ins<br>Trim work
+								Doors<br />Windows<br />Custom cabinetry<br />Built-ins<br />Trim
+								work
 							</h3>
 							<!-- <a href="#" class="btn">LEARN MORE</a> -->
 						</article>
@@ -214,12 +213,14 @@
 						get back to you in one business day.
 					</p>
 					<div class="cta-wrap">
-						<button type="button" class="btn js-copy-email">GET IN TOUCH</button>
+						<button type="button" class="btn js-copy-email">
+							GET IN TOUCH
+						</button>
 						<span class="copy-confirm" aria-live="polite"></span>
 					</div>
 				</section>
 
-<!-- 				<section class="footer-hero">
+				<!-- 				<section class="footer-hero">
 					<img
 						src="assets/images/newton_footer.jpeg"
 						alt="Stillpoint work"
