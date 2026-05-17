@@ -39,6 +39,7 @@ jobs:
           # Run rsync and capture output
           RSYNC_OUTPUT=$(rsync $FLAGS \
             --exclude='.git/' \
+            --exclude='.gitignore/' \
             --exclude='.design/' \
             --exclude='.dev/' \
             --exclude='.cursor/' \
@@ -46,6 +47,7 @@ jobs:
             --exclude='cgi-bin/' \
             --exclude='.well-known/' \
             --exclude='README.md' \
+            --exclude='readme.md' \
             --exclude='CLAUDE.md' \
             -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/whitneyb/domains/stillpoint-construction/ 2>/dev/null)
@@ -71,9 +73,9 @@ jobs:
 
           DELETES=$(echo "$OUTPUT" | grep '^\*deleting' | sed 's/\*deleting //' || true)
 
-          # Safe count: avoid grep -c returning exit 1 on no match
-          UPLOAD_COUNT=$(echo "$ALL_UPLOADS" | grep -c '[^[:space:]]' || echo 0)
-          DELETE_COUNT=$(echo "$DELETES" | grep -c '[^[:space:]]' || echo 0)
+          # Safe count: grep -c already prints "0" on no match, just swallow its exit 1
+          UPLOAD_COUNT=$(echo "$ALL_UPLOADS" | grep -c '[^[:space:]]' || true)
+          DELETE_COUNT=$(echo "$DELETES" | grep -c '[^[:space:]]' || true)
 
           if [ "$DRY_RUN" = "true" ]; then
             MODE="🔍 DRY RUN MODE: no files will be changed on the server for this run"
