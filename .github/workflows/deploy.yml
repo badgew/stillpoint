@@ -45,8 +45,8 @@ jobs:
             --exclude='.github/' \
             --exclude='cgi-bin/' \
             --exclude='.well-known/' \
-            --exclude='README.md/' \
-            --exclude='CLAUDE.md/' \
+            --exclude='README.md' \
+            --exclude='CLAUDE.md' \
             -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/whitneyb/domains/stillpoint-construction/ 2>/dev/null)
 
