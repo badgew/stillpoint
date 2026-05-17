@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Stillpoint Custom Construction</title>
+		<meta
+			name="description"
+			content="Custom construction and finishing. Boston."
+		/>
+		<meta
+			name="keywords"
+			content="custom, construction, carpentry, carpenter, finishing, boston"
+		/>
+		<meta name="author" content="Lucas Boegehold" />
+
+		<!-- Favicons -->
+		<link
+			rel="apple-touch-icon"
+			sizes="180x180"
+			href="assets/favicon/apple-touch-icon.png"
+		/>
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="32x32"
+			href="assets/favicon/favicon-32x32.png"
+		/>
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="16x16"
+			href="assets/favicon/favicon-16x16.png"
+		/>
+		<link rel="manifest" href="assets/favicon/site.webmanifest" />
+
+		<!-- Preload both webfonts so the browser fetches them in parallel
+		     with stylesheet parsing instead of waiting to discover their
+		     URLs inside @font-face. The `crossorigin` attribute is
+		     required even for same-origin fonts — without it the preload
+		     won't match the eventual font request (fonts are fetched in
+		     anonymous CORS mode). -->
+		<link
+			rel="preload"
+			href="assets/fonts/RiformaLL-Regular.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<link
+			rel="preload"
+			href="assets/fonts/Youth-Bold.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+
+	<body>
+		<!-- Mobile nav toggle. Hidden at desktop via CSS.
+		     Renders as '+' when closed, '−' when open: two bars, vertical
+		     bar hidden under [aria-expanded="true"]. -->
+		<button
+			class="nav-toggle"
+			type="button"
+			aria-expanded="false"
+			aria-controls="primary-nav"
+			aria-label="Open menu"
+		>
+			<span class="nav-toggle__bar nav-toggle__bar--h" aria-hidden="true"></span>
+			<span class="nav-toggle__bar nav-toggle__bar--v" aria-hidden="true"></span>
+		</button>
+
+		<section class="frame">
+			<img
+				class="wordmark wordmark--top"
+				src="assets/Stillpoint_Logo.svg"
+				alt="Stillpoint"
+			/>
+			<img
+				class="wordmark wordmark--bottom"
+				src="assets/Stillpoint_Slogan.svg"
+				alt="Find Your Quiet Place"
+			/>
+
+			<nav class="sidebar" id="primary-nav">
+				<ul class="sidebar-links">
+					<li><a href="#home">HOME</a></li>
+					<li><a href="#about">ABOUT</a></li>
+					<li><a href="#projects">PROJECTS</a></li>
+					<li><a href="#services">SERVICES</a></li>
+					<!-- <li><a href="#press">PRESS</a></li> -->
+					<li><a href="#contact">CONTACT</a></li>
+				</ul>
+
+				<ul class="sidebar-footer">
+					<li><a href="#terms">© 2026 STILLPOINT</a></li>
+				</ul>
+			</nav>
+
+			<main class="main-content">
+				<section class="hero" id="home">
+					<div class="hero__image-wrap">
+						<img
+							src="assets/images/newlondon_hero.jpeg"
+							alt="Stillpoint interior construction"
+							class="hero__image"
+						/>
+					</div>
+				</section>
+
+				<section class="intro" id="about">
+					<p class="intro__text">
+						Stillpoint was founded in 2025 by Lucas Boegehold, a finish
+						carpenter and general contractor with over a decade of experience in
+						residential construction. Our goal is to create spaces that help
+						people find their quiet place. We let the needs of the project guide
+						the output, while ensuring the results are practical and
+						thoughtfully crafted.
+					</p>
+					<div class="cta-wrap">
+						<button type="button" class="btn js-copy-email">GET IN TOUCH</button>
+						<span class="copy-confirm" aria-live="polite"></span>
+					</div>
+				</section>
+
+				<section class="case-studies" id="projects">
+					<h2 class="section-label">PROJECTS</h2>
+					<!-- <p class="section-intro">Lorem ipsum dolor sit amet.</p> -->
+
+					<div class="project-grid">
+						<article class="project-card">
+							<img
+								src="assets/images/newlondon.jpeg"
+								alt="Mudroom Bench"
+								class="project-card__image"
+							/>
+							<p class="project-card__label">NEW LONDON, NEW HAMPSHIRE</p>
+							<h3 class="project-card__title">
+								Faux timber frame cedar portico fit for a grand lakeside home.
+							</h3>
+							<!-- <a href="#" class="btn">LEARN MORE</a> -->
+						</article>
+
+						<article class="project-card">
+							<img
+								src="assets/images/cambridge.jpeg"
+								alt="Mudroom Bench"
+								class="project-card__image"
+							/>
+							<p class="project-card__label">CAMBRIDGE, MASSACHUSETTS</p>
+							<h3 class="project-card__title">
+								Two bathroom renovations for a growing family home.
+							</h3>
+							<!-- <a href="#" class="btn">LEARN MORE</a> -->
+						</article>
+						
+						<article class="project-card">
+							<img
+								src="assets/images/newton.jpeg"
+								alt="Window Seat"
+								class="project-card__image"
+							/>
+							<p class="project-card__label">NEWTON, MASSACHUSETTS</p>
+							<h3 class="project-card__title">
+								Sunny window seat, a must have for the dining room.
+							</h3>
+							<!-- <a href="#" class="btn">LEARN MORE</a> -->
+						</article>
+
+						<article class="project-card">
+							<img
+								src="assets/images/wellesely.jpeg"
+								alt="Built-In Pantry"
+								class="project-card__image"
+							/>
+							<p class="project-card__label">WELLESLEY, MASSACHUSETTS</p>
+							<h3 class="project-card__title">
+								Sleek built-in pantry to accommodate kitchen & household needs.
+							</h3>
+							<!-- <a href="#" class="btn">LEARN MORE</a> -->
+						</article>
+
+					</div>
+				</section>
+
+				<section class="case-studies" id="services">
+					<h2 class="section-label">SERVICES</h2>
+
+				<div class="project-grid">
+						<article class="project-card">
+							<p class="project-card__label">GENERAL CONTRACTING</p>
+							<h3 class="project-card__title">
+								Kitchen<br>Bathrooms<br>Additions<br>Renovations
+							</h3>
+						</article>
+
+						<article class="project-card">
+							<p class="project-card__label">FINISH CARPENTRY</p>
+							<h3 class="project-card__title">
+								Doors<br>Windows<br>Custom cabinetry<br>Built-ins<br>Trim work
+							</h3>
+							<!-- <a href="#" class="btn">LEARN MORE</a> -->
+						</article>
+					</div>
+				</section>
+
+				<!-- CTA STRIP -->
+				<section class="cta-strip" id="contact">
+					<p class="cta-strip__text">
+						Interested in working together? Reach out for an estimate and we'll
+						get back to you in one business day.
+					</p>
+					<div class="cta-wrap">
+						<button type="button" class="btn js-copy-email">GET IN TOUCH</button>
+						<span class="copy-confirm" aria-live="polite"></span>
+					</div>
+				</section>
+
+<!-- 				<section class="footer-hero">
+					<img
+						src="assets/images/newton_footer.jpeg"
+						alt="Stillpoint work"
+						class="footer-hero__image"
+					/>
+				</section> -->
+			</main>
+		</section>
+
+		<script src="scripts.js"></script>
+	</body>
+</html>

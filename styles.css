@@ -1,0 +1,596 @@
+/* ============================================================
+   STILLPOINT — styles.css
+   
+   Layout: fixed sidebar left + scrolling main content right.
+   Background: pink with vertical stripe pattern (CSS, no image needed).
+   Typography: Youth-Bold for display, RiformaLL-Regular for body.
+   ============================================================ */
+
+/* ── FONTS ─────────────────────────────────────────────────── */
+
+/* font-display: swap — paint fallback text immediately, swap to the
+   webfont when ready. Avoids the ~3s default FOIT window. The visible
+   font flash on slow connections is an intentional tradeoff for not
+   blocking the hero's text on a webfont fetch.
+
+   WOFF2-only is intentional: universal modern-browser support in 2026,
+   and the OTF originals (still in this folder) aren't referenced. */
+@font-face {
+	font-family: "RiformaLL";
+	font-weight: normal;
+	font-display: swap;
+	src: url("assets/fonts/RiformaLL-Regular.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Youth";
+	font-weight: bold;
+	font-display: swap;
+	src: url("assets/fonts/Youth-Bold.woff2") format("woff2");
+}
+
+/* ── CSS VARIABLES ──────────────────────────────────────────── */
+
+:root {
+	--color-bg: #ffffff;
+	--color-text: #1a1a1a;
+	--color-text-muted: #555;
+
+	--font-display: "Youth", serif;
+	--font-body: "RiformaLL", sans-serif;
+
+	/* ── Fluid space tokens ───────────────────────────────────
+	   clamp(min, vw-middle, max). Used to derive frame padding
+	   and other page-scale spacing. Tweak the middle value
+	   to make scaling more or less aggressive. */
+	--space-fluid-lg: clamp(5vw, 10vw, 9.375rem);
+	--space-fluid-md: clamp(1rem, 3vw, 2.5rem);
+	--space-fluid-sm: clamp(0.625rem, 2vw, 1.25rem);
+
+	/* ── Sidebar ─────────────────────────────────────────────── */
+	--sidebar-width: clamp(6rem, 14vw, 12.5rem);
+
+	/* ── Frame padding (derived from fluid tokens) ───────────── */
+	--frame-pad-top: var(--space-fluid-lg);
+	--frame-pad-right: var(--space-fluid-lg);
+	--frame-pad-bottom: var(--space-fluid-lg);
+	--frame-pad-left: var(--space-fluid-md);
+
+	--frame-pad-offset-ratio: 0.15;
+	--wordmark-spacing: calc(
+		var(--frame-pad-top) * var(--frame-pad-offset-ratio)
+	);
+
+	/* ── Content-area math ───────────────────────────────────
+	   Wordmarks live inside .frame (siblings of .main-content),
+	   so container queries aren't available here. Instead we
+	   derive the content area width directly so the wordmarks
+	   can be sized proportionally to it. */
+	--content-area-width: calc(
+		100vw - var(--sidebar-width) - var(--frame-pad-right) -
+			var(--frame-pad-left)
+	);
+
+	/* ── Wordmark widths (proportional to content area) ──────
+	   Each clamp has three knobs, each governing a different viewport range:
+	     min         — mobile floor (active below ~430px viewport)
+	     coefficient — fluid scaling (active in the laptop/tablet range)
+	     max         — desktop cap (dominates above ~1320px viewport)
+	   Tune the knob for the range you're correcting. Coefficient changes
+	   are invisible at desktop sizes when the max is already capping. */
+	--wordmark-top-width: clamp(
+		6.8rem,
+		calc(var(--content-area-width) * 0.4),
+		26rem
+	); /* 160px → 416px */
+	--wordmark-bottom-width: clamp(
+		12rem,
+		calc(var(--content-area-width) * 0.62),
+		38rem
+	);
+
+	/* ── Content padding ─────────────────────────────────────── */
+	--content-pad: var(--space-fluid-sm);
+
+	/* ── Nav Toggle  ─────────────────────────────────────── */
+	--nav-toggle-width: 4px;
+	--nav-toggle-position-top: var(--wordmark-spacing);
+	--nav-toggle-position-left: calc(
+		var(--wordmark-spacing) - var(--nav-toggle-width)
+	);
+}
+
+/* ── RESET ──────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	display: flex;
+	min-height: 100dvh;
+	background-color: var(--color-bg);
+
+	font-family: var(--font-body);
+	color: var(--color-text);
+	cursor: default;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+ul {
+	list-style: none;
+}
+
+img {
+	display: block;
+	width: 100%;
+	height: auto;
+	pointer-events: none;
+}
+
+/* ── FRAME ────────────────────────────────────────────────── */
+.frame {
+	padding: var(--frame-pad-top) var(--frame-pad-right) 0 var(--frame-pad-left);
+	position: relative;
+	display: flex;
+}
+
+/* ── WORDMARKS (SVG images) ─────────────────────────────────── */
+
+.wordmark {
+	position: absolute;
+	z-index: -1;
+	pointer-events: none;
+	user-select: none;
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.wordmark--top {
+	top: var(--wordmark-spacing);
+	right: var(--wordmark-spacing);
+	max-width: var(--wordmark-top-width);
+}
+.wordmark--bottom {
+	bottom: var(--wordmark-spacing);
+	right: var(--wordmark-spacing);
+	max-width: var(--wordmark-bottom-width);
+}
+
+/* ── MOBILE NAV TOGGLE ──────────────────────────────────────────
+   '+' (closed) / '−' (open). Hidden at desktop; revealed in the
+   <=40rem media query. Positioned to mirror the top wordmark so
+   the two visually balance across the top edge. */
+.nav-toggle {
+	display: none;
+	position: fixed;
+	top: var(--nav-toggle-position-top);
+	left: var(--nav-toggle-position-left);
+	width: 2.5rem;
+	height: 2.5rem;
+	padding: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	z-index: 300; /* above sidebar overlay (200) and raised wordmark (250) */
+	-webkit-tap-highlight-color: transparent;
+}
+
+.nav-toggle:focus-visible {
+	outline: 2px solid var(--color-text);
+	outline-offset: 2px;
+	border-radius: 0.25rem;
+}
+
+.nav-toggle__bar {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	display: block;
+	background: var(--color-text);
+	transition:
+		opacity 0.15s,
+		transform 0.15s;
+}
+
+.nav-toggle__bar--h {
+	width: 1rem;
+	height: var(--nav-toggle-width);
+	transform: translate(-50%, -50%);
+}
+
+.nav-toggle__bar--v {
+	width: var(--nav-toggle-width);
+	height: 1rem;
+	transform: translate(-50%, -50%);
+}
+
+/* Open state: hide vertical bar so the '+' becomes '−' */
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar--v {
+	opacity: 0;
+	transform: translate(-50%, -50%) scaleY(0);
+}
+
+/* ── SIDEBAR ────────────────────────────────────────────────── */
+.sidebar {
+	--sidebar-spacing: 1.5rem;
+	position: sticky;
+	top: var(--sidebar-spacing);
+	align-self: flex-start; /* Prevent flex parent from stretching sidebar to full height */
+	width: var(--sidebar-width);
+	height: 100dvh; /* Dynamic viewport height — accounts for mobile browser URL bar */
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	z-index: 100;
+}
+
+.sidebar ul {
+	display: flex;
+	flex-direction: column;
+	gap: 0.625rem;
+}
+
+.sidebar a {
+	font-family: var(--font-display);
+	font-size: 1.125rem;
+	letter-spacing: 0.025em;
+	line-height: 1.2;
+	color: var(--color-text);
+	/*transition: opacity 0.15s;*/
+}
+
+/*.sidebar a:hover {
+	opacity: 0.5;
+}*/
+
+.sidebar-footer a {
+	font-size: 1.125rem;
+	opacity: 0.4;
+}
+
+.sidebar-footer {
+	position: sticky;
+	bottom: var(--sidebar-spacing);
+}
+
+.sidebar-links li {
+	/* Reserve space for rotated text so siblings shift smoothly.
+	   The inner <a> is ~1.35rem tall; rotated 90° its width becomes
+	   the height. We animate a padding-bottom to open/close that gap. */
+	transition: padding-bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	padding-bottom: 0;
+}
+
+.sidebar-links li.is-rotated {
+	padding-bottom: 5rem;
+}
+
+.sidebar-links li a {
+	display: inline-block;
+	transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+	transform-origin: left bottom;
+}
+
+.sidebar-links li.is-rotated a {
+	transform: rotate(90deg) translateX(0.1em);
+}
+
+/* ── MAIN CONTENT ───────────────────────────────────────────── */
+
+.main-content {
+	flex: 1; /* Fill remaining space alongside the fixed-width sidebar */
+	min-width: 0; /* Allow children to shrink properly inside a flex item */
+	padding-bottom: var(--frame-pad-bottom);
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+/* ── HERO ───────────────────────────────────────────────────── */
+
+.hero {
+	position: relative;
+}
+
+.hero__image {
+	width: 100%;
+	aspect-ratio: 5 / 3;
+	display: block;
+	object-fit: cover;
+}
+
+/* ── INTRO ──────────────────────────────────────────────────── */
+
+.intro {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.intro__text {
+	font-family: var(--font-body);
+	font-size: clamp(
+		1.25rem,
+		1rem + 1.5vw,
+		2rem
+	); /* accessible fluid: rem floor + (rem + vw) middle */
+	line-height: 1.2;
+	letter-spacing: 0;
+	font-weight: 400;
+	text-wrap: pretty; /* visually appealing text wrapping - yay */
+}
+
+/* ── BUTTONS ────────────────────────────────────────────────── */
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.625rem 3.125rem;
+	border: 2.5px solid var(--color-text); /* fine pixel detail intentionally kept */
+	border-radius: 0.2rem;
+	font-family: var(--font-display);
+	font-size: 1rem;
+	letter-spacing: 0.06em;
+	color: var(--color-text);
+	background: transparent;
+	cursor: pointer;
+	transition:
+		background 0.2s,
+		color 0.2s;
+	width: fit-content;
+	margin-bottom: 5rem;
+}
+
+.btn:hover {
+	background: var(--color-text);
+	color: var(--color-bg);
+}
+
+.cta-wrap {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+	margin-bottom: 5rem;
+}
+
+.cta-wrap .btn {
+	margin-bottom: 0;
+}
+
+.copy-confirm {
+	font-family: var(--font-body);
+	font-size: 0.8rem;
+	letter-spacing: 0.04em;
+	color: var(--color-text);
+	opacity: 0.6;
+}
+
+/* ── CASE STUDIES ───────────────────────────────────────────── */
+
+.case-studies {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	padding-bottom: 3.5rem;
+}
+
+.section-label {
+	font-family: var(--font-display);
+	font-size: 7.25rem;
+	letter-spacing: -4px;
+	font-weight: bold;
+	margin-bottom: -0.625rem;
+}
+
+@media screen and (max-width: 640px) {
+  .section-label {
+	font-size: 2.25rem;
+	letter-spacing: 0px;
+  }
+}
+
+.section-intro {
+	font-family: var(--font-body);
+	font-size: 1.125rem;
+	line-height: 1.2;
+	letter-spacing: 0.25;
+	max-width: 50%;
+	color: var(--color-text-muted);
+}
+
+/* Two-column grid for project cards */
+.project-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.5rem;
+}
+
+.project-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.625rem;
+}
+
+.project-card__image {
+	width: 100%;
+	aspect-ratio: 4/3;
+	object-fit: cover;
+}
+
+.project-grid article:nth-child(even) .project-card__image {
+	aspect-ratio: 3/4;
+}
+
+.project-card__label {
+	font-family: var(--font-display);
+	font-size: 1.125rem;
+	letter-spacing: 0;
+	font-weight: bold;
+	text-transform: uppercase;
+	margin-top: 0.625rem;
+}
+
+.project-card__title {
+	font-family: var(--font-body);
+	font-size: 1.25rem;
+	font-weight: 400;
+	line-height: 1.2;
+	letter-spacing: 0.0156em; /* ~0.25px at 16px base */
+}
+
+/* ── CTA STRIP ──────────────────────────────────────────────── */
+
+.cta-strip {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.cta-strip__text {
+	font-family: var(--font-body);
+	font-size: clamp(
+		1.25rem,
+		1rem + 1.5vw,
+		2rem
+	); /* accessible fluid: rem floor + (rem + vw) middle */
+	line-height: 1.2;
+	max-width: 90%;
+	margin-top: 2.5rem;
+	letter-spacing: 0;
+	text-wrap: pretty; /* visually appealing text wrapping - yay */
+}
+
+/* ── FOOTER HERO ────────────────────────────────────────────── */
+
+.footer-hero {
+	position: relative;
+	/* padding-right: 18%; */
+}
+
+.footer-hero__image {
+	width: 100%;
+	aspect-ratio: 5 / 3;
+	object-fit: cover;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (min-width: 40rem) {
+	.main-content {
+		padding-left: 1rem;
+	}
+}
+
+@media (max-width: 40rem) {
+	/* --sidebar-width is now fluid in :root; no override needed.
+	   --content-pad inherits from --space-fluid-sm which already shrinks. */
+
+	.project-grid {
+		grid-template-columns: 1fr;
+		padding-right: 3rem;
+	}
+
+	.hero__image-wrap,
+	.footer-hero {
+		/* padding-right: 3rem; */ /* for now disable until we have design direction on mobile */
+	}
+
+	/* ── Mobile nav ───────────────────────────────────────────
+	   At <=40rem the sidebar leaves flex flow and becomes a
+	   full-viewport overlay. The hamburger toggle shows in
+	   its place, mirroring the top wordmark across the page.
+
+	   All overlay rules are scoped via body:has(.nav-toggle) so
+	   pages without a toggle (e.g. services.html) keep their
+	   default sticky sidebar at mobile widths. */
+
+	.nav-toggle {
+		display: block;
+	}
+
+	/* Sidebar is no longer taking flex space on pages with a
+	   nav-toggle, so the content area used for wordmark sizing
+	   widens. The top wordmark floor (6.8rem) still governs at
+	   these viewport widths, so this mostly affects the bottom
+	   wordmark proportions. */
+	body:has(.nav-toggle) {
+		--content-area-width: calc(
+			100vw - var(--frame-pad-right) - var(--frame-pad-left)
+		);
+	}
+
+	body:has(.nav-toggle) .sidebar {
+		position: fixed;
+		inset: 0;
+		width: 100%;
+		height: 100dvh;
+		background: var(--color-bg);
+		/* Top padding clears the toggle button + a little breathing room */
+		padding: calc(var(--wordmark-spacing) + 2.5rem + 0.5rem)
+			var(--frame-pad-right) var(--frame-pad-bottom) var(--frame-pad-left);
+		z-index: 200;
+		opacity: 0;
+		visibility: hidden;
+		/* visibility flips after opacity fade so focus order updates cleanly */
+		transition:
+			opacity 0.2s ease,
+			visibility 0s linear 0.2s;
+	}
+
+	body.nav-open .sidebar {
+		opacity: 1;
+		visibility: visible;
+		transition:
+			opacity 0.2s ease,
+			visibility 0s;
+	}
+
+	/* Wordmark stays anchored top-right when overlay is open;
+	   raise its z-index above the overlay so it shows through. */
+	body.nav-open .wordmark--top {
+		z-index: 250;
+	}
+
+	/* Bottom wordmark is decorative; hide it under the overlay */
+	body.nav-open .wordmark--bottom {
+		display: none;
+	}
+
+	/* Larger, display-styled nav links inside the open overlay */
+	body:has(.nav-toggle) .sidebar-links {
+		gap: 0.5rem;
+	}
+
+	body:has(.nav-toggle) .sidebar-links a {
+		font-size: 1.5rem;
+		letter-spacing: 0.04em;
+	}
+
+	/* Lock background scroll while the overlay is open */
+	body.nav-open {
+		overflow: hidden;
+	}
+}
+
+/* Reduced-motion: disable the overlay fade */
+@media (prefers-reduced-motion: reduce) {
+	.sidebar,
+	.nav-toggle__bar {
+		transition: none;
+	}
+}
