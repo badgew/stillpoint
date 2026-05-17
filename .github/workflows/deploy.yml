@@ -1,0 +1,118 @@
+name: Deploy to BigScoots
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run: preview changes without deploying"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via rsync
+        id: rsync
+        run: |
+          DRY_RUN=${{ github.event.inputs.dry_run }}
+          FLAGS="-avz --checksum --delete"
+          if [ "$DRY_RUN" = "true" ]; then
+            FLAGS="$FLAGS --dry-run"
+          fi
+
+          # Run rsync and capture output
+          RSYNC_OUTPUT=$(rsync $FLAGS \
+            --exclude='.git/' \
+            --exclude='.design/' \
+            --exclude='.dev/' \
+            --exclude='.cursor/' \
+            --exclude='.github/' \
+            --exclude='cgi-bin/' \
+            --exclude='.well-known/' \
+            --exclude='README.md/' \
+            --exclude='CLAUDE.md/' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/whitneyb/domains/stillpoint-construction/ 2>/dev/null)
+
+          echo "$RSYNC_OUTPUT" > /tmp/rsync_output.txt
+          echo "dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
+
+      - name: Summary
+        run: |
+          DRY_RUN=${{ steps.rsync.outputs.dry_run }}
+          OUTPUT=$(cat /tmp/rsync_output.txt)
+
+          # Parse uploads — files only (no dirs, no deleting lines, no rsync summary lines)
+          ALL_UPLOADS=$(echo "$OUTPUT" \
+            | grep -v '^\*deleting' \
+            | grep -v '/$' \
+            | grep -v '^sending' \
+            | grep -v '^sent' \
+            | grep -v '^total' \
+            | grep -v '^\.' \
+            | grep -v '^$' \
+            || true)
+
+          DELETES=$(echo "$OUTPUT" | grep '^\*deleting' | sed 's/\*deleting //' || true)
+
+          # Safe count: avoid grep -c returning exit 1 on no match
+          UPLOAD_COUNT=$(echo "$ALL_UPLOADS" | grep -c '[^[:space:]]' || echo 0)
+          DELETE_COUNT=$(echo "$DELETES" | grep -c '[^[:space:]]' || echo 0)
+
+          if [ "$DRY_RUN" = "true" ]; then
+            MODE="🔍 DRY RUN MODE: no files will be changed on the server for this run"
+          else
+            MODE="🚀 DEPLOYED — changes are now live"
+          fi
+
+          echo ""
+          echo "========================================"
+          echo "$MODE"
+          echo "========================================"
+          echo ""
+
+          if [ "$UPLOAD_COUNT" -eq 0 ] && [ "$DELETE_COUNT" -eq 0 ]; then
+            echo "✅ Everything is up to date. No changes needed."
+          else
+            if [ "$UPLOAD_COUNT" -gt 0 ]; then
+              if [ "$DRY_RUN" = "true" ]; then
+                echo "📤 Files that WOULD be uploaded ($UPLOAD_COUNT):"
+              else
+                echo "📤 Files uploaded ($UPLOAD_COUNT):"
+              fi
+              echo "$ALL_UPLOADS" | while read -r f; do
+                [ -n "$f" ] && echo "   + $f"
+              done
+              echo ""
+            fi
+
+            if [ "$DELETE_COUNT" -gt 0 ]; then
+              if [ "$DRY_RUN" = "true" ]; then
+                echo "🗑  Files that WOULD be deleted ($DELETE_COUNT):"
+              else
+                echo "🗑  Files deleted ($DELETE_COUNT):"
+              fi
+              echo "$DELETES" | while read -r f; do
+                [ -n "$f" ] && echo "   - $f"
+              done
+              echo ""
+            fi
+          fi
+
+          echo "========================================"
